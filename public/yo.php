@@ -1,12 +1,9 @@
 <?php
 declare(strict_types=1);
-require __DIR__ . '/../src/sesion.php';
+require __DIR__ . '/../src/permisos.php';
 
 try {
-    $u = ses_usuario_actual();
-    if ($u === null) {
-        ses_responder(['error' => SES_MSG_INVALIDA], 401);
-    }
+    $u = perm_exigir('sesion.consultar');
     ses_responder(['id' => (int)$u['id'], 'correo' => $u['correo'], 'rol' => $u['rol']]);
 } catch (Throwable $e) {
     error_log($e->getMessage());
