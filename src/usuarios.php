@@ -72,3 +72,21 @@ function activarCuenta(string $token): bool {
         return false;
     }
 }
+
+
+function reenviarActivacion(string $correo): void {
+    $correo = trim(mb_strtolower($correo));
+    if (!correoValido($correo)) {
+        return;
+    }
+    try {
+        $st = db()->prepare("SELECT id FROM usuarios WHERE correo = ? AND estado = 'pendiente'");
+        $st->execute([$correo]);
+        $fila = $st->fetch();
+        if ($fila) {
+            encolarActivacion((int)$fila['id'], $correo);
+        }
+    } catch (Throwable $ex) {
+        // La respuesta al usuario es siempre la misma.
+    }
+}
