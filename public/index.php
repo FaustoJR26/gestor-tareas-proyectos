@@ -1,0 +1,1 @@
+<?php echo "Hola, PHP " . PHP_VERSION;
