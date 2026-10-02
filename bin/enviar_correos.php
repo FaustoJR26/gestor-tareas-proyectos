@@ -30,21 +30,40 @@ foreach ($ids as $id) {
     $c = $st->fetch();
 
     try {
+        $puerto = (int)env('SMTP_PORT', '587');
+
         $mail = new PHPMailer(true);
         $mail->isSMTP();
         $mail->Host = env('SMTP_HOST', '');
-        $mail->Port = (int)env('SMTP_PORT', '587');
+        $mail->Port = $puerto;
         $mail->SMTPAuth = true;
         $mail->Username = env('SMTP_USER', '');
         $mail->Password = env('SMTP_PASS', '');
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        // Puerto 465 usa SSL directo; el resto (587) usa STARTTLS.
+        $mail->SMTPSecure = ($puerto === 465)
+            ? PHPMailer::ENCRYPTION_SMTPS
+            : PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Timeout = 15;
         $mail->CharSet = 'UTF-8';
+
+        // Solo para desarrollo: si el entorno intercepta el tráfico SSL,
+        // poner SMTP_VERIFY_SSL=false en el .env. Por defecto la verificación está activa.
+        if (strtolower(trim(env('SMTP_VERIFY_SSL', 'true'))) === 'false') {
+            $mail->SMTPOptions = [
+                'ssl' => [
+                    'verify_peer'       => false,
+                    'verify_peer_name'  => false,
+                    'allow_self_signed' => true,
+                ],
+            ];
+        }
+
         $mail->setFrom(env('SMTP_FROM', env('SMTP_USER', '')), 'Gestor de tareas');
         $mail->addAddress($c['destinatario']);
         $mail->Subject = $c['asunto'];
         $mail->Body = $c['cuerpo'];
         $mail->send();
+
         $enviados++;
         echo "Enviado a {$c['destinatario']}\n";
     } catch (Throwable $ex) {
@@ -53,6 +72,7 @@ foreach ($ids as $id) {
             ->execute([$id]);
         $fallidos++;
         echo "No se pudo enviar a {$c['destinatario']}. Queda pendiente.\n";
+        echo "Motivo: " . $ex->getMessage() . "\n";
     }
 }
 
