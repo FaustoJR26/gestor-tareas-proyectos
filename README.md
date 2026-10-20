@@ -235,6 +235,54 @@ php bin\enviar_correos.php
 
 Los usuarios viven en MySQL. Reinicia Apache y MySQL desde XAMPP y vuelve a listarlos.
 
+## Gestión de permisos (RF-GP-01 a 07)
+
+Un usuario Estándar solicita el permiso `eliminar_tareas`; un Administrador lo aprueba o rechaza. Transiciones: Pendiente → Aprobada → Aplicada y Pendiente → Rechazada, declaradas en `src/estados_solicitud.php`. En PowerShell usa `curl.exe` en lugar de `curl`.
+
+Necesitas un token de Estándar (TOKEN_E) y uno de Administrador (TOKEN_A), obtenidos con `login.php`. Las solicitudes de los ejemplos se numeran 1, 2, 3 en una base limpia.
+
+**RF-GP-01.** Crear solicitud (nace `pendiente`):
+
+    curl -i -X POST -H "Authorization: Bearer TOKEN_E" -d "permiso=eliminar_tareas" BASE/solicitud_crear.php
+
+**RF-GP-02.** El Administrador lista las pendientes; el Estándar recibe 403:
+
+    curl -i -H "Authorization: Bearer TOKEN_A" BASE/solicitudes.php
+    curl -i -H "Authorization: Bearer TOKEN_E" BASE/solicitudes.php
+
+**RF-GP-03 y 05.** Aprobar. Antes de aprobar el Estándar no puede eliminar (403); después pasa el chequeo de permiso (200 si la tarea existe, 404 si no):
+
+    curl -i -X POST -H "Authorization: Bearer TOKEN_E" -d "id=1" BASE/tarea_eliminar.php
+    curl -i -X POST -H "Authorization: Bearer TOKEN_A" -d "id=1" BASE/solicitud_aprobar.php
+    curl -i -X POST -H "Authorization: Bearer TOKEN_E" -d "id=1" BASE/tarea_eliminar.php
+    mysql -u root gestor_tareas -e "SELECT id, estado, resuelto_por, resuelto_en FROM solicitudes_permiso"
+
+**RF-GP-04.** Rechazar. Sin motivo responde 422; con motivo se completa:
+
+    curl -i -X POST -H "Authorization: Bearer TOKEN_E" -d "permiso=eliminar_tareas" BASE/solicitud_crear.php
+    curl -i -X POST -H "Authorization: Bearer TOKEN_A" -d "id=2" BASE/solicitud_rechazar.php
+    curl -i -X POST -H "Authorization: Bearer TOKEN_A" -d "id=2" -d "motivo=No procede" BASE/solicitud_rechazar.php
+
+**RF-GP-06.** Aprobar dos veces responde 409 y el estado no cambia. Aprobar una rechazada también:
+
+    curl -i -X POST -H "Authorization: Bearer TOKEN_A" -d "id=1" BASE/solicitud_aprobar.php
+    curl -i -X POST -H "Authorization: Bearer TOKEN_A" -d "id=2" BASE/solicitud_aprobar.php
+
+**RF-GP-07.** El Administrador crea su propia solicitud e intenta aprobarla (403):
+
+    curl -i -X POST -H "Authorization: Bearer TOKEN_A" -d "permiso=eliminar_tareas" BASE/solicitud_crear.php
+    curl -i -X POST -H "Authorization: Bearer TOKEN_A" -d "id=3" BASE/solicitud_aprobar.php
+
+**RD-09.** Reinicia Apache y MySQL desde XAMPP y vuelve a listar con `solicitudes.php`: las solicitudes siguen ahí.
+
+## Pruebas
+
+Un solo comando ejecuta toda la suite (crea la base `gestor_tareas_test` si no existe y lanza PHPUnit). Requiere MySQL encendido:
+
+    php bin\probar.php
+
+Las pruebas de gestión de permisos están en `tests/SolicitudesTest.php` y llaman al servicio `src/solicitudes.php` directamente, sin levantar la aplicación.
+
 ## Máquina de estados de negocio (RF-NEG-03, 04, 05)
 
-La entidad central es `tareas` (`database/tareas.sql`). Los estados, las transiciones permitidas, las prohibidas y el estado terminal están declarados en un solo lugar: `src/estados_tarea.php`. La tabla de transiciones está en `docs/maquina-de-estados.md`.
+La entidad central es `tareas` (`database/tareas.sql`). mysql -u root gestor_tareas < database\permisos.sql Los estados, las transiciones permitidas, las prohibidas y el estado terminal están declarados en un solo lugar: `src/estados_tarea.php`. La tabla de transiciones está en `docs/maquina-de-estados.md`.
