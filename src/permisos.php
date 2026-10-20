@@ -17,6 +17,11 @@ const PERM_OPERACIONES = [
     'usuarios.reactivar'   => 'administrador',
     'usuarios.forzar_reset'    => 'administrador',
     'sesion.cambiar_password'  => 'autenticado',
+    'solicitudes.crear'     => 'autenticado',
+    'solicitudes.listar'    => 'administrador',
+    'solicitudes.aprobar'   => 'administrador',
+    'solicitudes.rechazar'  => 'administrador',
+    'tareas.eliminar'       => 'autenticado',
 ];
 
 /** Se llama al inicio de cada operación protegida. Rechaza en el servidor. */
