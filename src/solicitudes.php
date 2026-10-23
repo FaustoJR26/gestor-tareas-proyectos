@@ -38,7 +38,7 @@ function sol_listar_pendientes(PDO $db): array
 }
  function sol_listar_de_usuario(PDO $db, int $usuarioId): array
 {
-    $st = $db->prepare('SELECT * FROM solicitudes_permiso WHERE solicitante_id = ? ORDER BY id');
+    $st = $db->prepare('SELECT * FROM solicitudes_permiso WHERE solicitante_id <> ? ORDER BY id');
     $st->execute([$usuarioId]);
     return $st->fetchAll(PDO::FETCH_ASSOC);
 }
