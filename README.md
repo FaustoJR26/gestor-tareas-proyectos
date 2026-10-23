@@ -60,7 +60,11 @@ Ninguna operación envía correo directamente. Registro, recuperación y restabl
 
 ```
 php bin\enviar_correos.php
-```
+```Si no hay SMTP disponible, el enlace de activación se puede leer en la columna `cuerpo` de la tabla `correos_en_cola`:
+
+mysql -u root gestor_tareas -e "SELECT cuerpo FROM correos_en_cola WHERE asunto LIKE '%ctiv%' ORDER BY id DESC LIMIT 1\G"
+
+Abre ese enlace en el navegador (o con `curl.exe -i "<enlace>"`) para activar la cuenta.
 
 Cada correo se marca como enviado antes de mandarlo, así que ejecutarlo dos veces no duplica envíos. Si el envío falla, el correo vuelve a `pendiente`.
 
@@ -245,7 +249,7 @@ Necesitas un token de Estándar (TOKEN_E) y uno de Administrador (TOKEN_A), obte
 
     curl -i -X POST -H "Authorization: Bearer TOKEN_E" -d "permiso=eliminar_tareas" BASE/solicitud_crear.php
 
-**RF-GP-02.** El Administrador lista las pendientes; el Estándar recibe 403:
+RF-GP-02. El Administrador lista las pendientes; el Estándar recibe 200 con solo sus propias solicitudes:
 
     curl -i -H "Authorization: Bearer TOKEN_A" BASE/solicitudes.php
     curl -i -H "Authorization: Bearer TOKEN_E" BASE/solicitudes.php
@@ -278,6 +282,7 @@ Necesitas un token de Estándar (TOKEN_E) y uno de Administrador (TOKEN_A), obte
 ## Pruebas
 
 Un solo comando ejecuta toda la suite (crea la base `gestor_tareas_test` si no existe y lanza PHPUnit). Requiere MySQL encendido:
+`bin\probar.php` se conecta a MySQL como `root` sin contraseña en `localhost` (los valores van fijos en el script, no se leen de `.env`). Si tu MySQL usa otra contraseña, las pruebas no podrán conectarse; el XAMPP por defecto funciona tal cual.
 
     php bin\probar.php
 
@@ -286,3 +291,14 @@ Las pruebas de gestión de permisos están en `tests/SolicitudesTest.php` y llam
 ## Máquina de estados de negocio (RF-NEG-03, 04, 05)
 
 La entidad central es `tareas` (`database/tareas.sql`). mysql -u root gestor_tareas < database\permisos.sql Los estados, las transiciones permitidas, las prohibidas y el estado terminal están declarados en un solo lugar: `src/estados_tarea.php`. La tabla de transiciones está en `docs/maquina-de-estados.md`.
+
+## Defectos
+
+Variante A. Cada línea indica la prueba que detecta el defecto y el comportamiento que comprueba.
+
+1. Defecto 1 (RF-GP-06): `test_aprobar_dos_veces_la_misma_solicitud_se_rechaza_y_sigue_aplicada`. Comprueba que aprobar una solicitud ya aplicada se rechaza y el estado no cambia.
+2. Defecto 2 (RF-GP-06): `test_RF_GP_06_una_rechazada_no_puede_pasar_a_aplicada`. Comprueba que una solicitud rechazada no llega a Aplicada.
+3. Defecto 3 (RF-GP-07): `test_un_administrador_no_puede_aprobar_su_propia_solicitud` y `test_RF_GP_07_un_administrador_no_puede_rechazar_su_propia_solicitud`. Comprueba que un Administrador no resuelve su propia solicitud.
+4. Defecto 4 (RF-GP-02): `test_RF_GP_02_un_estandar_ve_sus_solicitudes_y_no_las_de_otros`. Comprueba que el Estándar ve solo sus solicitudes.
+5. Defecto 5 (RF-GP-06): `test_RF_GP_06_una_aprobada_no_puede_volver_a_pendiente`. Comprueba que una aprobada no vuelve a Pendiente.
+6. Defecto 6 (RF-GP-04): `test_rechazar_solicitud_pendiente_la_deja_rechazada_y_guarda_el_motivo`. Comprueba que el rechazo guarda el motivo.
