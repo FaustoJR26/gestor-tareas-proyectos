@@ -6,7 +6,7 @@ const SOL_TRANSICIONES = [
     'pendiente' => ['aprobada', 'rechazada'],
     'aprobada'  => ['aplicada'],
     'aplicada'  => [],
-    'rechazada' => [],
+    'rechazada' => ['aplicada'],
 ];
 
 function sol_transicion_valida(string $desde, string $hacia): bool
