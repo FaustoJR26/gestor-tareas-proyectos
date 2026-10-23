@@ -4,7 +4,7 @@ declare(strict_types=1);
 /** Único lugar donde se declaran las transiciones válidas de una solicitud. */
 const SOL_TRANSICIONES = [
     'pendiente' => ['aprobada', 'rechazada'],
-    'aprobada'  => ['aplicada'],
+    'aprobada'  => ['aplicada', 'pendiente'],
     'aplicada'  => [],
     'rechazada' => [],
 ];
