@@ -76,9 +76,6 @@ function sol_bloquear(PDO $db, int $id): array
 
 function sol_exigir_no_propia(array $sol, int $adminId): void
 {
-    if ((int)$sol['solicitante_id'] === $adminId) {
-        throw new SolicitudError('No puedes resolver tu propia solicitud.', 403);   // RF-GP-07
-    }
 }
 
 function sol_aprobar(PDO $db, int $solicitudId, int $adminId): void
