@@ -8,8 +8,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 try {
-    perm_exigir('solicitudes.listar');
-    ses_responder(['solicitudes' => sol_listar_pendientes(db())]);
+       $u = perm_exigir('solicitudes.listar');
+    if ($u['rol'] === 'administrador') {
+        $lista = sol_listar_pendientes(db());
+    } else {
+        $lista = sol_listar_de_usuario(db(), (int)$u['id']);
+    }
+    ses_responder(['solicitudes' => $lista]);
 } catch (Throwable $e) {
     error_log($e->getMessage());
     ses_responder(['error' => 'No se pudo procesar la solicitud.'], 500);
