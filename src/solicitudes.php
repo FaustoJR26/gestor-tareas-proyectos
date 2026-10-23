@@ -36,6 +36,12 @@ function sol_listar_pendientes(PDO $db): array
     return $db->query("SELECT * FROM solicitudes_permiso WHERE estado = 'pendiente' ORDER BY id")
               ->fetchAll(PDO::FETCH_ASSOC);
 }
+ function sol_listar_de_usuario(PDO $db, int $usuarioId): array
+{
+    $st = $db->prepare('SELECT * FROM solicitudes_permiso WHERE solicitante_id = ? ORDER BY id');
+    $st->execute([$usuarioId]);
+    return $st->fetchAll(PDO::FETCH_ASSOC);
+}
 
 function usuario_tiene_permiso(PDO $db, int $usuarioId, string $permiso): bool
 {
