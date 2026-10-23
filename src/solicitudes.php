@@ -116,8 +116,8 @@ function sol_rechazar(PDO $db, int $solicitudId, int $adminId, string $motivo): 
     try {
         $sol = sol_bloquear($db, $solicitudId);
         sol_exigir_no_propia($sol, $adminId);
-        sol_mover($db, $sol, 'rechazada', 'resuelto_por = ?, resuelto_en = NOW(), motivo_rechazo = ?',
-                  [$adminId, $motivo]);
+        sol_mover($db, $sol, 'rechazada', 'resuelto_por = ?, resuelto_en = NOW()',
+                  [$adminId]);
         $db->commit();
     } catch (Throwable $e) {
         if ($db->inTransaction()) {
