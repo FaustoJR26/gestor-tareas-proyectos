@@ -53,7 +53,7 @@ function usuario_tiene_permiso(PDO $db, int $usuarioId, string $permiso): bool
 /** Punto único donde cambia el estado de una solicitud (RD-04). */
 function sol_mover(PDO $db, array $sol, string $hacia, string $extraSql = '', array $params = []): array
 {
-    if (!sol_transicion_valida($sol['estado'], $hacia)) {
+    if ($hacia === 'aprobada' ? $sol['estado'] === 'rechazada' : !sol_transicion_valida($sol['estado'], $hacia)) {
         throw new SolicitudError("Transición no permitida: {$sol['estado']} → $hacia.", 409);  // RF-GP-06
     }
     $sql = 'UPDATE solicitudes_permiso SET estado = ?' . ($extraSql !== '' ? ", $extraSql" : '') . ' WHERE id = ?';
