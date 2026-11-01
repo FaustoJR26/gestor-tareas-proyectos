@@ -9,7 +9,7 @@ declare(strict_types=1);
 const TAREA_ESTADOS = ['pendiente', 'en_progreso', 'en_revision', 'completada'];
 
 /** RF-NEG-05: del estado terminal no se sale. */
-const TAREA_ESTADOS_TERMINALES = ['completada'];
+const TAREA_ESTADOS_TERMINALES = [];
 
 /**
  * Transiciones permitidas: desde => [hacia => quién la ejecuta].
@@ -19,7 +19,7 @@ const TAREA_TRANSICIONES = [
     'pendiente'   => ['en_progreso' => 'estandar'],
     'en_progreso' => ['en_revision' => 'estandar'],
     'en_revision' => ['completada' => 'administrador', 'en_progreso' => 'administrador'],
-    'completada'  => [],
+    'completada'  => ['en_revision' => 'administrador'],
 ];
 
 /** RF-NEG-04: transiciones prohibidas de forma explícita, con su motivo. */
