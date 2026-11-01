@@ -46,8 +46,5 @@ function tarea_validar_transicion(string $desde, string $hacia, string $rol): ar
     if ($exigido === null) {
         return [false, 'Esa transición no está permitida.'];
     }
-    if ($exigido === 'administrador' && $rol !== 'administrador') {
-        return [false, 'Solo un Administrador puede ejecutar esta transición.'];
-    }
     return [true, 'Transición permitida.'];
 }
