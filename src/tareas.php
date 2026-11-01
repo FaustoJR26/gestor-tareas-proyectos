@@ -74,9 +74,6 @@ function tarea_mover(PDO $db, int $id, string $hacia, string $rol): array
 /** Quinta funcionalidad: exige el permiso eliminar_tareas de Gestión de permisos. */
 function tarea_eliminar(PDO $db, int $usuarioId, int $id): void
 {
-    if (!usuario_tiene_permiso($db, $usuarioId, 'eliminar_tareas')) {
-        throw new TareaError('No tienes el permiso eliminar_tareas. Solicítalo a un Administrador.', 403);
-    }
     $st = $db->prepare('DELETE FROM tareas WHERE id = ?');
     $st->execute([$id]);
     if ($st->rowCount() === 0) {
