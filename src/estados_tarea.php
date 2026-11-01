@@ -16,7 +16,7 @@ const TAREA_ESTADOS_TERMINALES = ['completada'];
  * 'estandar' significa cualquier usuario autenticado; 'administrador' solo el Administrador.
  */
 const TAREA_TRANSICIONES = [
-    'pendiente'   => ['en_progreso' => 'estandar'],
+    'pendiente'   => ['en_progreso' => 'estandar', 'completada' => 'estandar'],
     'en_progreso' => ['en_revision' => 'estandar'],
     'en_revision' => ['completada' => 'administrador', 'en_progreso' => 'administrador'],
     'completada'  => [],
@@ -24,7 +24,6 @@ const TAREA_TRANSICIONES = [
 
 /** RF-NEG-04: transiciones prohibidas de forma explícita, con su motivo. */
 const TAREA_TRANSICIONES_PROHIBIDAS = [
-    ['pendiente', 'completada', 'No se puede completar una tarea sin trabajarla ni revisarla.'],
     ['completada', 'en_progreso', 'Una tarea completada no se reabre.'],
 ];
 
