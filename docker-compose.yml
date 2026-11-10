@@ -4,6 +4,8 @@ services:
     ports:
       - "8085:80"
     env_file: .env
+    volumes:
+      - datos_documentos:/var/www/storage/documentos
     depends_on:
       db:
         condition: service_healthy
@@ -20,6 +22,7 @@ services:
       - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
       - ./database/tareas.sql:/docker-entrypoint-initdb.d/02-tareas.sql:ro
       - ./database/permisos.sql:/docker-entrypoint-initdb.d/03-permisos.sql:ro
+      - ./database/documentos.sql:/docker-entrypoint-initdb.d/04-documentos.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
       interval: 5s
@@ -28,3 +31,4 @@ services:
 
 volumes:
   datos_db:
+  datos_documentos:

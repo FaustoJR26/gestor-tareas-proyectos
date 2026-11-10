@@ -17,3 +17,8 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-interaction --no-scripts
 
 COPY . .
+
+# Carpeta donde se guardan los documentos (va montada en un volumen)
+ENV DOCS_DIR=/var/www/storage/documentos
+RUN mkdir -p /var/www/storage/documentos \
+ && chown -R www-data:www-data /var/www/storage
