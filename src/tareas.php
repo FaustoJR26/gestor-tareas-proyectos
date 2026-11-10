@@ -83,3 +83,18 @@ function tarea_eliminar(PDO $db, int $usuarioId, int $id): void
         throw new TareaError('La tarea no existe.', 404);
     }
 }
+/** Guarda el costo de una tarea y la moneda en que está expresado. */
+function tarea_fijar_costo(PDO $db, int $id, string $costo, string $moneda): array
+{
+    $moneda = strtoupper(trim($moneda));
+    if (!is_numeric($costo) || (float)$costo < 0 || (float)$costo > 9999999999.99) {
+        throw new TareaError('El costo debe ser un número mayor o igual a 0.', 422);   // RD-07
+    }
+    if (!preg_match('/^[A-Z]{3}$/', $moneda)) {
+        throw new TareaError('Usa un código de moneda de 3 letras, por ejemplo USD.', 422);
+    }
+    tarea_obtener($db, $id); // lanza 404 si no existe
+    $db->prepare('UPDATE tareas SET costo = ?, moneda = ? WHERE id = ?')
+       ->execute([number_format((float)$costo, 2, '.', ''), $moneda, $id]);
+    return tarea_obtener($db, $id);
+}

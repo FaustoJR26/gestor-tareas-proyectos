@@ -26,6 +26,7 @@ const PERM_OPERACIONES = [
     'tareas.listar'         => 'autenticado',
     'tareas.ver'            => 'autenticado',
     'tareas.cambiar_estado' => 'autenticado',
+        'tareas.costo'          => 'autenticado',
         'documentos.subir'      => 'autenticado',
     'documentos.listar'     => 'autenticado',
     'documentos.descargar'  => 'autenticado',

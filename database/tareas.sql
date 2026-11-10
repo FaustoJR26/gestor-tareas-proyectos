@@ -4,6 +4,8 @@ CREATE TABLE IF NOT EXISTS `tareas` (
   `descripcion` text DEFAULT NULL,
   `estado` enum('pendiente','en_progreso','en_revision','completada') NOT NULL DEFAULT 'pendiente',
   `creado_por` int(11) NOT NULL,
+  `costo` decimal(12,2) DEFAULT NULL,
+  `moneda` char(3) NOT NULL DEFAULT 'USD',
   `creado_en` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `creado_por` (`creado_por`),
