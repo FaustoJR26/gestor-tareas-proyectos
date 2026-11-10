@@ -26,6 +26,10 @@ const PERM_OPERACIONES = [
     'tareas.listar'         => 'autenticado',
     'tareas.ver'            => 'autenticado',
     'tareas.cambiar_estado' => 'autenticado',
+        'documentos.subir'      => 'autenticado',
+    'documentos.listar'     => 'autenticado',
+    'documentos.descargar'  => 'autenticado',
+    'documentos.eliminar'   => 'autenticado',
 ];
 
 /** Se llama al inicio de cada operación protegida. Rechaza en el servidor. */

@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS documentos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(190) NOT NULL,
+  nombre_guardado CHAR(32) NOT NULL,
+  tipo VARCHAR(100) NOT NULL,
+  tamano INT NOT NULL,
+  subido_por INT NOT NULL,
+  subido_en DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  eliminado_en DATETIME NULL,
+  FOREIGN KEY (subido_por) REFERENCES usuarios(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
