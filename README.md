@@ -37,7 +37,7 @@ Los archivos de los documentos y los datos de MySQL viven en volúmenes con nomb
 Varios ejemplos de este README consultan MySQL. En PowerShell, dentro de la carpeta del proyecto, define este atajo una vez por terminal:
 
 ```
-function sql($q) { docker compose exec -T db sh -c "mysql -u root -p`$MYSQL_ROOT_PASSWORD gestor_tareas -e `"$q`"" }
+function sql($q) { $q | docker compose exec -T db sh -c 'MYSQL_PWD=$MYSQL_ROOT_PASSWORD mysql -t -u root gestor_tareas' }
 ```
 
 Uso: `sql "SELECT id, correo, rol FROM usuarios"`
